@@ -3,9 +3,15 @@ from discord.ext import commands
 from discord import Embed
 
 # Author : Aroun Le BriCodeur
-# lib : discord.py
-# https://pypi.org/project/discord.py/
 # create 01/04/21 | 0.1
+
+# lib : discord.py
+# # Linux/macOS
+# >> python3 -m pip install -U discord.py
+# # Windows
+# >> py -3 -m pip install -U discord.py
+# https://pypi.org/project/discord.py/
+
 #Pour whitelist une commande par rôle : @commands.has_any_role("🔐 PATRON")
 # pour ajouter des rôles : ("🔐 PATRON", "pdg", "branleur")
 
