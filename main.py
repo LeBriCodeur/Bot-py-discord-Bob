@@ -2,12 +2,15 @@ import discord
 from discord.ext import commands
 from discord import Embed
 
+# Author : Aroun Le BriCodeur
+# lib : discord.py
+# create 01/04/21
 
 #Pour whitelist une commande par rôle : @commands.has_any_role("🔐 PATRON")
 # pour ajouter des rôles : ("🔐 PATRON", "pdg", "branleur")
-prefix = "!"
+prefix = "--" # préfixe utilisé par le bot
 bot = commands.Bot(command_prefix=prefix, description="coucou")
-token = "TOKEN-DU-BOT"
+token = "Token-du-bot"
 
 #Ready
 @bot.event
@@ -15,7 +18,7 @@ async def on_ready():
     print("Je prends vie !!!!")
 
 
-#Error event
+#Error event evite de crache le bot ^^
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
@@ -24,11 +27,11 @@ async def on_command_error(ctx, error):
         await ctx.send("Quelque chose me dit que tu n'es pas autorisé à utiliser cette commande :angry:")
 
 
-# commande qui dis de la merde et redirige le membre vers la commande help
+# commande qui dis de la merde et redirige le membre vers la commande cmd
 @bot.command()
 async def bob(a_ctx):
     message = f"Salut je suis Bob le bot.\nJe suis fait pour le serveur de :\nMartin62#4778 et AlexLiveFrr#0050\ndédié à ETS2 !\nMon créateur est une âme généreuse et on le nomme :\
-    \n'Le BriCodeur'.\nC'est grâce à lui que je peux dire plein de conneries et ça me ravi chaque jour qui passe.\nSinon {a_ctx.author.name} tu peux utiliser {prefix}cmd pour les commandes"
+    \nLe BriCodeur.\nC'est grâce à lui que je peux dire plein de conneries et ça me ravi chaque jour qui passe.\nSinon {a_ctx.author.name} tu peux utiliser :\n{prefix}cmd pour les commandes"
     await a_ctx.send(message)
 
 
