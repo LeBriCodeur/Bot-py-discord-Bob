@@ -4,13 +4,15 @@ from discord import Embed
 
 # Author : Aroun Le BriCodeur
 # lib : discord.py
-# create 01/04/21
-
+# https://pypi.org/project/discord.py/
+# create 01/04/21 | 0.1
 #Pour whitelist une commande par rôle : @commands.has_any_role("🔐 PATRON")
 # pour ajouter des rôles : ("🔐 PATRON", "pdg", "branleur")
-prefix = "--" # préfixe utilisé par le bot
-bot = commands.Bot(command_prefix=prefix, description="coucou")
-token = "Token-du-bot"
+
+# préfixe utilisé par le bot
+prefix = "--" 
+bot = commands.Bot(command_prefix=prefix, description="Je suis une description")
+token = "Token-Du-Bot"
 
 #Ready
 @bot.event
@@ -30,26 +32,44 @@ async def on_command_error(ctx, error):
 # commande qui dis de la merde et redirige le membre vers la commande cmd
 @bot.command()
 async def bob(a_ctx):
-    message = f"Salut je suis Bob le bot.\nJe suis fait pour le serveur de :\nMartin62#4778 et AlexLiveFrr#0050\ndédié à ETS2 !\nMon créateur est une âme généreuse et on le nomme :\
-    \nLe BriCodeur.\nC'est grâce à lui que je peux dire plein de conneries et ça me ravi chaque jour qui passe.\nSinon {a_ctx.author.name} tu peux utiliser :\n{prefix}cmd pour les commandes"
+    message = f"Salut je suis Bob le bot.\n\
+Je suis fait pour le serveur de :\n\
+Martin62#4778 et AlexLiveFrr#0050\n\
+dédié à ETS2 !\n\
+Mon créateur est une âme généreuse et on le nomme :\
+\nLe BriCodeur.\n\
+C'est grâce à lui que je peux dire plein de conneries et ça me ravi chaque jour qui passe.\n\
+Sinon {a_ctx.author.name} tu peux utiliser :\n\
+{prefix}cmd pour les commandes"
     await a_ctx.send(message)
 
 
 # liste des commandes
 @bot.command()
 async def cmd(a_ctx):
-    await a_ctx.send(f"Les différentes commandes sont : \n{prefix}bob\n")
+    cmd_all = ["bob", "servInfo"]
+    cmd_admin = ["ban", "kick"]
+    message = "Les différentes commandes sont :\n"
+    for i in cmd_all:
+        message += f"{prefix}{i}\n"
+    message += "ADMIN Commande : \n"
+    for i in cmd_admin:
+        message += f"{prefix}{i}\n"
+    await a_ctx.send(message)
+
 
 # retourne les infos du serveur si envie (c'est à finir faut composer le message)
 @bot.command()
-async def serverInfo(a_ctx):
+async def servInfo(a_ctx):
     server = a_ctx.guild
-    serverName = server.server_name # Nom du serveur
+    serverName = server.name # Nom du serveur
     serverDesc = server.description # Description du serveur : /!\ Normal si c'est None ou Null /!\
     nrbTxtChan = len(server.text_channels) # Nombre de canal texte du serveur 
     nrbVocChan = len(server.voice_channels) # Nombre de canal vocaux du serveur 
-    nrbMembers = server.member_count # Nombre de membres du serveur 
-    await a_ctx.send(f"bla bla bla toutes les infos du serveur : {serverName} {serverDesc} {nrbTxtChan} {nrbVocChan} {nrbMembers} ")
+    nrbMembers = server.member_count # Nombre de membres du serveur
+    if serverDesc is None: serverDesc = "Pas de description"
+    await a_ctx.send(f"Infos du serveur : \nnom du serveur : {serverName},\ndescription : {serverDesc},\nNrb chan texte : {nrbTxtChan},\n\
+Nrb chan vocaux : {nrbVocChan},\nNrb membres : {nrbMembers}")
 
 
 # Ban
@@ -79,6 +99,7 @@ async def ban(ctx, member:discord.User=None, reason=None):
     print(msg_chan)
     # et enfin ban du membre
     await member.ban(reason=reason)
+
 
 # Kick
 @bot.command()
