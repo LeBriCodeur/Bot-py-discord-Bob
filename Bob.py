@@ -1,30 +1,36 @@
+import os
 import discord
+import twitch as twh
+from dotenv import load_dotenv
 from discord.ext import commands
 from discord import Embed
+
 
 # Author : Aroun Le BriCodeur
 # create 01/04/21 | 0.1
 
-# lib : discord.py
-# # Linux/macOS
-# >> python3 -m pip install -U discord.py
-# # Windows
-# >> py -3 -m pip install -U discord.py
-# https://pypi.org/project/discord.py/
-
 #Pour whitelist une commande par rôle : @commands.has_any_role("🔐 PATRON")
 # pour ajouter des rôles : ("🔐 PATRON", "pdg", "branleur")
+load_dotenv() # dotenv_path=".env"
 
+# info twitch
+account_name = "Aroun31"
+channel_name = "Aroun31"
+token_twitch = os.getenv("TOKEN_TWITCH")
+client_id = os.getenv("CLIENT_ID")
+
+# info discord
+token_discord = os.getenv("TOKEN_DISCORD")
 # préfixe utilisé par le bot
-prefix = "--" 
+prefix = "!" 
 bot = commands.Bot(command_prefix=prefix, description="Je suis une description")
-token = "Token-Du-Bot"
 
-#Ready
+
+# Ready
 @bot.event
 async def on_ready():
-    print("Je prends vie !!!!")
-
+    print("Waaahh ça fait du bien de dormir.\nBob au rapport !")
+    print("préfix utilisé : ", prefix)
 
 #Error event evite de crache le bot ^^
 @bot.event
@@ -36,19 +42,15 @@ async def on_command_error(ctx, error):
 
 
 # commande qui dis de la merde et redirige le membre vers la commande cmd
-@bot.command()
+@bot.command(name="b")
 async def bob(a_ctx):
     message = f"Salut je suis Bob le bot.\n\
-Je suis fait pour le serveur de :\n\
-Martin62#4778 et AlexLiveFrr#0050\n\
-dédié à ETS2 !\n\
 Mon créateur est une âme généreuse et on le nomme :\
 \nLe BriCodeur.\n\
 C'est grâce à lui que je peux dire plein de conneries et ça me ravi chaque jour qui passe.\n\
 Sinon {a_ctx.author.name} tu peux utiliser :\n\
 {prefix}cmd pour les commandes"
     await a_ctx.send(message)
-
 
 # liste des commandes
 @bot.command()
@@ -63,9 +65,8 @@ async def cmd(a_ctx):
         message += f"{prefix}{i}\n"
     await a_ctx.send(message)
 
-
 # retourne les infos du serveur si envie (c'est à finir faut composer le message)
-@bot.command()
+@bot.command(name="infoserv")
 async def servInfo(a_ctx):
     server = a_ctx.guild
     serverName = server.name # Nom du serveur
@@ -77,6 +78,14 @@ async def servInfo(a_ctx):
     await a_ctx.send(f"Infos du serveur : \nnom du serveur : {serverName},\ndescription : {serverDesc},\nNrb chan texte : {nrbTxtChan},\n\
 Nrb chan vocaux : {nrbVocChan},\nNrb membres : {nrbMembers}")
 
+# Delete message
+@bot.command(name="delmsg")
+async def delete_msg(ctx, number: int):
+    messages = await ctx.channel.history(limit=number + 1).flatten()
+    print("messages : ", messages)
+    for each_message in messages:
+        await each_message.delete()
+    print("Nettoyage des messages !")
 
 # Ban
 @bot.command()
@@ -105,7 +114,6 @@ async def ban(ctx, member:discord.User=None, reason=None):
     print(msg_chan)
     # et enfin ban du membre
     await member.ban(reason=reason)
-
 
 # Kick
 @bot.command()
@@ -136,6 +144,5 @@ async def kick(ctx, member:discord.User=None, reason=None):
     await member.kick(reason=reason)
 
 
-bot.run(token)
-
+bot.run(token_discord)
 
