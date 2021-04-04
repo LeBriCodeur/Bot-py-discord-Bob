@@ -26,7 +26,6 @@ for user in helix.users([user_id]):
 # for video in helix.videos([user_id]):
 #     print(video.title)
 
-
 # for comment in helix.video(user_id).comments:
 #     print(comment.commenter.display_name)
 

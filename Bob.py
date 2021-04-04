@@ -1,9 +1,10 @@
 import os
 import discord
 import twitch as twh
+from typing import List
+from discord import Embed
 from dotenv import load_dotenv
 from discord.ext import commands
-from discord import Embed
 
 
 # Author : Aroun Le BriCodeur
@@ -23,7 +24,7 @@ client_id = os.getenv("CLIENT_ID")
 token_discord = os.getenv("TOKEN_DISCORD")
 # préfixe utilisé par le bot
 prefix = "!" 
-bot = commands.Bot(command_prefix=prefix, description="Je suis une description")
+bot = commands.Bot(command_prefix=prefix, description="Description !")
 
 
 # Ready
@@ -36,27 +37,26 @@ async def on_ready():
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send("Comment dire... Il manque des info pour que ça fonctionne... qu'il est con celui là :rolling_eyes:.")
+        await ctx.send("Comment dire...\nIl manque des info pour que ça fonctionne...\nQu'il est con celui là\n :rolling_eyes:.")
     if isinstance(error, commands.MissingPermissions):
-        await ctx.send("Quelque chose me dit que tu n'es pas autorisé à utiliser cette commande :angry:")
-
+        await ctx.send("Quelque chose me dit que...\nTu n'es pas autorisé à utiliser cette commande :angry:")
 
 # commande qui dis de la merde et redirige le membre vers la commande cmd
-@bot.command(name="b")
+@bot.command(name="bob")
 async def bob(a_ctx):
     message = f"Salut je suis Bob le bot.\n\
 Mon créateur est une âme généreuse et on le nomme :\
 \nLe BriCodeur.\n\
 C'est grâce à lui que je peux dire plein de conneries et ça me ravi chaque jour qui passe.\n\
 Sinon {a_ctx.author.name} tu peux utiliser :\n\
-{prefix}cmd pour les commandes"
+{prefix}cmd pour connaître les commandes"
     await a_ctx.send(message)
 
 # liste des commandes
 @bot.command()
 async def cmd(a_ctx):
-    cmd_all = ["bob", "servInfo"]
-    cmd_admin = ["ban", "kick"]
+    cmd_all = ["bob", "infoserv!", "soutien"]
+    cmd_admin = ["ban", "kick", "del_msg value (default : 1)", "cchan 'help'"]
     message = "Les différentes commandes sont :\n"
     for i in cmd_all:
         message += f"{prefix}{i}\n"
@@ -78,11 +78,41 @@ async def servInfo(a_ctx):
     await a_ctx.send(f"Infos du serveur : \nnom du serveur : {serverName},\ndescription : {serverDesc},\nNrb chan texte : {nrbTxtChan},\n\
 Nrb chan vocaux : {nrbVocChan},\nNrb membres : {nrbMembers}")
 
+
+#soutenir le projet
+@bot.command(name="soutien")
+async def soutien(a_ctx):
+    url_paypal = "https://www.paypal.com/paypalme/arounMcf"
+    await a_ctx.send(f"Tu peux soutenir le bot ici :\n{url_paypal}\nCela permet de montrer de l'intéret en vers le bot et de faire manger le dev ( moi :) )")
+
+
+        # # # # # # # # # # # # # # #
+# # # # # Commands whitelist admins # # # # # 
+        # # # # # # # # # # # # # # #
+
+
+# Création de catégories & canaux
+@bot.command(name="cchan")
+@commands.has_permissions(administrator=True)
+async def create_chan(a_ctx, a_type, *a_nameChan):
+    server = a_ctx.guild
+    if a_type == "chan":
+        for i in a_nameChan:
+            print(f"Channel text create : '{i}'  by : {a_ctx.message.author}")
+            await server.create_text_channel(i)
+    elif a_type == "cat":
+        for i in a_nameChan:
+            print(f"Category create : '{i}'  by : {a_ctx.message.author}")
+            await server.create_category(i)
+    elif a_type == "help":
+        a_ctx.channel.send("Créer une catégorie :\n```!cchan 'cat' 'name category 1' 'name category 2' etc...```\n\
+        Créer un channel (text) :\n```!cchan 'chan' 'name-channel-1' 'name-channel-2' etc...```")
+
 # Delete message
-@bot.command(name="delmsg")
-async def delete_msg(ctx, number: int):
+@bot.command(name="del_msg")
+@commands.has_permissions(administrator=True)
+async def delete_msg(ctx, number: int = 1):
     messages = await ctx.channel.history(limit=number + 1).flatten()
-    print("messages : ", messages)
     for each_message in messages:
         await each_message.delete()
     print("Nettoyage des messages !")
@@ -97,6 +127,7 @@ async def ban(ctx, member:discord.User=None, reason=None):
     msg_chan = f"{member} a été ban par {admin_name} pour la raison suivante : {reason}"
     # message envoyé en mp à la personne mentionné donc le banni
     msg_mp = f"Tu as été ban de : {ctx.guild.name} pour la raison suivante : {reason}. par {admin_name}"
+
     # Vérification pour pas se ban soit même ou si personne est mentionné
     if member is None or member == ctx.message.author:
         if member == ctx.message.author:
@@ -125,6 +156,7 @@ async def kick(ctx, member:discord.User=None, reason=None):
     msg_chan = f"{member} a été kick par {admin_name} pour la raison suivante : {reason}"
     # message envoyé en mp à la personne mentionné donc le kické
     msg_mp = f"Tu as été kick de : {ctx.guild.name} pour la raison suivante : {reason}. par {admin_name}"
+
     # Vérification pour pas se kick soit même ou si personne est mentionné
     if member is None or member == ctx.message.author:
         if member == ctx.message.author:
