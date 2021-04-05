@@ -1,7 +1,6 @@
 import os
 import discord
-import twitch as twh
-from typing import List
+import Twipy
 from discord import Embed
 from dotenv import load_dotenv
 from discord.ext import commands
@@ -33,6 +32,14 @@ async def on_ready():
     print("Waaahh ça fait du bien de dormir.\nBob au rapport !")
     print("préfix utilisé : ", prefix)
 
+
+# /!\ intercepte les messages mais coup rend les commands inutilisable :/ . /!\
+# @bot.event
+# async def on_message(message):
+#     # print(message)
+#     print(f"\nNouveau message sur \"{message.guild.name}\" dans \"{message.channel.name}\" de \"{message.author.name}\"\nMessage : {message.content}")
+
+
 #Error event evite de crache le bot ^^
 @bot.event
 async def on_command_error(ctx, error):
@@ -44,19 +51,20 @@ async def on_command_error(ctx, error):
 # commande qui dis de la merde et redirige le membre vers la commande cmd
 @bot.command(name="bob")
 async def bob(a_ctx):
-    message = f"Salut je suis Bob le bot.\n\
-Mon créateur est une âme généreuse et on le nomme :\
-\nLe BriCodeur.\n\
-C'est grâce à lui que je peux dire plein de conneries et ça me ravi chaque jour qui passe.\n\
-Sinon {a_ctx.author.name} tu peux utiliser :\n\
-{prefix}cmd pour connaître les commandes"
+    message = f"Salut je suis Bob le bot.\n"\
+    +"Mon créateur est une âme généreuse et on le nomme :"\
+    +"\nLe BriCodeur.\n"\
+    +"C'est grâce à lui que je peux dire plein de conneries et ça me ravi chaque jour qui passe.\n"\
+    +f"Sinon {a_ctx.author.name} tu peux utiliser :\n"\
+    +f"{prefix}cmd pour connaître les commandes"
     await a_ctx.send(message)
 
 # liste des commandes
 @bot.command()
 async def cmd(a_ctx):
-    cmd_all = ["bob", "infoserv!", "soutien"]
-    cmd_admin = ["ban", "kick", "del_msg value (default : 1)", "cchan 'help'"]
+    print(f"\n{a_ctx.author.name} à fait appel à !cmd sur {a_ctx.guild.name}")
+    cmd_all = ["bob", "infoserv", "soutien"]
+    cmd_admin = ["ban", "kick", "del_msg value (default : 1)", "cchan \"help\""]
     message = "Les différentes commandes sont :\n"
     for i in cmd_all:
         message += f"{prefix}{i}\n"
@@ -75,9 +83,8 @@ async def servInfo(a_ctx):
     nrbVocChan = len(server.voice_channels) # Nombre de canal vocaux du serveur 
     nrbMembers = server.member_count # Nombre de membres du serveur
     if serverDesc is None: serverDesc = "Pas de description"
-    await a_ctx.send(f"Infos du serveur : \nnom du serveur : {serverName},\ndescription : {serverDesc},\nNrb chan texte : {nrbTxtChan},\n\
-Nrb chan vocaux : {nrbVocChan},\nNrb membres : {nrbMembers}")
-
+    await a_ctx.send(f"Infos du serveur : \nnom du serveur : {serverName},\ndescription : {serverDesc},\nNrb chan texte : {nrbTxtChan},\n"\
+    +f"Nrb chan vocaux : {nrbVocChan},\nNrb membres : {nrbMembers}")
 
 #soutenir le projet
 @bot.command(name="soutien")
@@ -87,35 +94,39 @@ async def soutien(a_ctx):
 
 
         # # # # # # # # # # # # # # #
-# # # # # Commands whitelist admins # # # # # 
+# # # # # Commands whitelist admins # # # # #
         # # # # # # # # # # # # # # #
-
 
 # Création de catégories & canaux
 @bot.command(name="cchan")
 @commands.has_permissions(administrator=True)
-async def create_chan(a_ctx, a_type, *a_nameChan):
+async def newchan(a_ctx, a_type, *a_nameChan):
     server = a_ctx.guild
+    print(f"\n{a_ctx.guild.name} | {a_ctx.message.author} :: {a_type} :: {a_nameChan}")
+    for i in a_nameChan:
+        print(i)
     if a_type == "chan":
         for i in a_nameChan:
-            print(f"Channel text create : '{i}'  by : {a_ctx.message.author}")
             await server.create_text_channel(i)
+            print(f"Channel text create : '{i}'  by : {a_ctx.message.author} in {a_ctx.guild.name}")
     elif a_type == "cat":
         for i in a_nameChan:
-            print(f"Category create : '{i}'  by : {a_ctx.message.author}")
             await server.create_category(i)
+            print(f"Category create : '{i}'  by : {a_ctx.message.author} in {a_ctx.guild.name}")
     elif a_type == "help":
-        a_ctx.channel.send("Créer une catégorie :\n```!cchan 'cat' 'name category 1' 'name category 2' etc...```\n\
-        Créer un channel (text) :\n```!cchan 'chan' 'name-channel-1' 'name-channel-2' etc...```")
+        print("help calling")
+        await a_ctx.channel.send("Créer une catégorie :\n```!cchan \"cat\" \"name category 1\" \"name category 2\" etc...```\n"\
+        +"Créer un channel (text) :\n```!cchan \"chan\" \"name-channel-1\" \"name-channel-2\" etc...```")
+
 
 # Delete message
 @bot.command(name="del_msg")
 @commands.has_permissions(administrator=True)
-async def delete_msg(ctx, number: int = 1):
-    messages = await ctx.channel.history(limit=number + 1).flatten()
+async def delete_msg(a_ctx, number: int = 1):
+    messages = await a_ctx.channel.history(limit=number + 1).flatten()
     for each_message in messages:
         await each_message.delete()
-    print("Nettoyage des messages !")
+    print(f"{a_ctx.guild.name} | {a_ctx.message.author} :: Nettoyage de {number} message(s) ")
 
 # Ban
 @bot.command()
@@ -127,7 +138,7 @@ async def ban(ctx, member:discord.User=None, reason=None):
     msg_chan = f"{member} a été ban par {admin_name} pour la raison suivante : {reason}"
     # message envoyé en mp à la personne mentionné donc le banni
     msg_mp = f"Tu as été ban de : {ctx.guild.name} pour la raison suivante : {reason}. par {admin_name}"
-
+    print(f"\n{msg_chan} sur ctx.guild.name")
     # Vérification pour pas se ban soit même ou si personne est mentionné
     if member is None or member == ctx.message.author:
         if member == ctx.message.author:
@@ -156,7 +167,7 @@ async def kick(ctx, member:discord.User=None, reason=None):
     msg_chan = f"{member} a été kick par {admin_name} pour la raison suivante : {reason}"
     # message envoyé en mp à la personne mentionné donc le kické
     msg_mp = f"Tu as été kick de : {ctx.guild.name} pour la raison suivante : {reason}. par {admin_name}"
-
+    print(f"\n{msg_chan} sur ctx.guild.name")
     # Vérification pour pas se kick soit même ou si personne est mentionné
     if member is None or member == ctx.message.author:
         if member == ctx.message.author:
@@ -176,5 +187,8 @@ async def kick(ctx, member:discord.User=None, reason=None):
     await member.kick(reason=reason)
 
 
+
 bot.run(token_discord)
+# tw = Twipy.Twipy()
+# tw.run()
 
