@@ -187,6 +187,30 @@ async def kick(ctx, member:discord.User=None, reason=None):
     await member.kick(reason=reason)
 
 
+# import thread
+# def runtw():
+#     tw = Twipy.Twipy()
+#     tw.run()
+
+# class mytwipy(theading.Thread):
+#     def __init__(self, a_bt_tw):      # jusqua = donnée supplémentaire
+#         threading.Thread.__init__(self)
+#     self.bt_tw = a_bt_tw
+#     tw = self.bt_tw.Twipy()
+#     tw.run()
+
+# import threading
+
+# def runtw():
+#     tw = Twipy.Twipy()
+#     tw.run()
+
+# t1 = threading.Thread(target=runtw)
+# t1.start()
+# t1.join()
+
+# btw = mytwipy(Twipy)
+# btw.start()
 
 bot.run(token_discord)
 # tw = Twipy.Twipy()
